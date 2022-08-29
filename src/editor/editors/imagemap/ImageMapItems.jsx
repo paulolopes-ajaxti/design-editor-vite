@@ -102,7 +102,7 @@ class ImageMapItemsClass extends Component {
 				message.info('Already drawing');
 				return;
 			}
-			const id = uuid();
+			const id = nanoid();
 			const option = Object.assign({}, item.option, { id });
 			if (item.option.superType === 'svg' && item.type === 'default') {
 				this.handlers.onSVGModalVisible(item.option);
@@ -112,7 +112,7 @@ class ImageMapItemsClass extends Component {
 		},
 		onAddSVG: (option, centered) => {
 			const { canvasRef } = this.props;
-			canvasRef.handler.add({ ...option, type: 'svg', superType: 'svg', id: uuid(), name: 'New SVG' }, centered);
+			canvasRef.handler.add({ ...option, type: 'svg', superType: 'svg', id: nanoid(), name: 'New SVG' }, centered);
 			this.handlers.onSVGModalVisible();
 		},
 		onDrawingItem: item => {
@@ -194,7 +194,7 @@ class ImageMapItemsClass extends Component {
 			if (dt.types.length && dt.types[0] === 'Files') {
 				const { files } = dt;
 				Array.from(files).forEach(file => {
-					file.uid = uuid();
+					file.uid = nanoid();
 					const { type } = file;
 					if (type === 'image/png' || type === 'image/jpeg' || type === 'image/jpg') {
 						const item = {
@@ -227,7 +227,7 @@ class ImageMapItemsClass extends Component {
 
 	renderItems = items => (
 		<Flex flexWrap="wrap" flexDirection="column" style={{ width: '100%' }}>
-			{items.map(item => this.renderItem(item))}
+			{items?.map(item => this.renderItem(item))}
 		</Flex>
 	);
 
@@ -329,7 +329,7 @@ class ImageMapItemsClass extends Component {
 	}
 }
 
-const ImageMapItems = ({ canvasRef, descriptors }) => {
+const ImageMapItems = React.forwardRef(({ descriptors }, canvasRef) => {
 	const [activeKey, setActiveKey] = useState([])
 	const [collapse, setCollapse] = useState(false)
 	const [textSearch, setTextSearch] = useState('')
@@ -338,36 +338,36 @@ const ImageMapItems = ({ canvasRef, descriptors }) => {
 	const [svgModalVisible, setSvgModalVisible] = useState(false)
 
 	const onAddItem = (item, centered) => {
-		if (canvasRef.handler.interactionMode === 'polygon') {
+		if (canvasRef?.current?.handler?.interactionMode === 'polygon') {
 			message.info('Already drawing');
 			return;
 		}
 		const id = nanoid();
 		const option = Object.assign({}, item.option, { id });
+
 		if (item.option.superType === 'svg' && item.type === 'default') {
 			onSVGModalVisible(item.option);
 			return;
 		}
-		canvasRef.handler.add(option, centered);
+		canvasRef?.current?.handler?.add(option, centered);
 	}
 
 	const onAddSVG = (option, centered) => {
-		const { canvasRef } = this.props;
-		canvasRef.handler.add({ ...option, type: 'svg', superType: 'svg', id: uuid(), name: 'New SVG' }, centered);
+		canvasRef?.current?.handler?.add({ ...option, type: 'svg', superType: 'svg', id: nanoid(), name: 'New SVG' }, centered);
 		onSVGModalVisible();
 	}
 
 	const onDrawingItem = (item) => {
-		if (canvasRef.handler.interactionMode === 'polygon') {
+		if (canvasRef?.current?.handler?.interactionMode === 'polygon') {
 			message.info('Already drawing');
 			return;
 		}
 		if (item.option.type === 'line') {
-			canvasRef.handler.drawingHandler.line.init();
+			canvasRef?.current?.handler?.drawingHandler?.line.init();
 		} else if (item.option.type === 'arrow') {
-			canvasRef.handler.drawingHandler.arrow.init();
+			canvasRef?.current?.handler?.drawingHandler?.arrow.init();
 		} else {
-			canvasRef.handler.drawingHandler.polygon.init();
+			canvasRef?.current?.handler?.drawingHandler?.polygon.init();
 		}
 	}
 
@@ -384,10 +384,10 @@ const ImageMapItems = ({ canvasRef, descriptors }) => {
 	}
 
 	const onSearchNode = e => {
-		const filteredDescriptors = transformList()
+		const filteredDescriptor = transformList()
 			.filter(descriptor => descriptor.name.toLowerCase().includes(e.target.value.toLowerCase()));
 			setTextSearch(e.target.value)
-			setFilteredDescriptors(filteredDescriptors)
+			setFilteredDescriptors(filteredDescriptor)
 	}
 
 	const onSVGModalVisible = () => {
@@ -430,7 +430,7 @@ const ImageMapItems = ({ canvasRef, descriptors }) => {
 		if (dt.types.length && dt.types[0] === 'Files') {
 			const { files } = dt;
 			Array.from(files).forEach(file => {
-				file.uid = uuid();
+				file.uid = nanoid();
 				const { type } = file;
 				if (type === 'image/png' || type === 'image/jpeg' || type === 'image/jpg') {
 					const item = {
@@ -460,18 +460,20 @@ const ImageMapItems = ({ canvasRef, descriptors }) => {
 		e.target.classList.remove('dragging');
 	}
 
-	const attachEventListener = (canvas) => {
-		canvas.canvas.wrapperEl.addEventListener('dragenter', onDragEnter, false);
-		canvas.canvas.wrapperEl.addEventListener('dragover', onDragOver, false);
-		canvas.canvas.wrapperEl.addEventListener('dragleave', onDragLeave, false);
-		canvas.canvas.wrapperEl.addEventListener('drop', onDrop, false);
+	const attachEventListener = (canvasCurrent) => {
+		console.log(canvasCurrent, 'attach')
+		canvasCurrent?.current?.canvas?.wrapperEl?.addEventListener('dragenter', onDragEnter, false);
+		canvasCurrent?.current?.canvas?.wrapperEl?.addEventListener('dragover', onDragOver, false);
+		canvasCurrent?.current?.canvas?.wrapperEl?.addEventListener('dragleave', onDragLeave, false);
+		canvasCurrent?.current?.canvas?.wrapperEl?.addEventListener('drop', onDrop, false);
 	};
 
-	const detachEventListener = (canvas) => {
-		canvas.canvas.wrapperEl.removeEventListener('dragenter', onDragEnter);
-		canvas.canvas.wrapperEl.removeEventListener('dragover', onDragOver);
-		canvas.canvas.wrapperEl.removeEventListener('dragleave', onDragLeave);
-		canvas.canvas.wrapperEl.removeEventListener('drop', onDrop);
+	const detachEventListener = (canvasCurrent) => {
+		console.log(canvasCurrent, 'detach')
+		canvasCurrent?.current?.canvas?.wrapperEl?.removeEventListener('dragenter', onDragEnter);
+		canvasCurrent?.current?.canvas?.wrapperEl?.removeEventListener('dragover', onDragOver);
+		canvasCurrent?.current?.canvas?.wrapperEl?.removeEventListener('dragleave', onDragLeave);
+		canvasCurrent?.current?.canvas?.wrapperEl?.removeEventListener('drop', onDrop);
 	};
 
 	const waitForCanvasRender = (canvas) => {
@@ -484,7 +486,7 @@ const ImageMapItems = ({ canvasRef, descriptors }) => {
 		}, 5);
 	};
 
-	renderItem = (item, centered) =>
+	const renderItem = (item, centered) =>
 		item.type === 'drawing' ? (
 			<div
 				key={item.name}
@@ -515,9 +517,10 @@ const ImageMapItems = ({ canvasRef, descriptors }) => {
 			</div>
 		);
 
-	renderItems = (items) => (
+	const renderItems = (items) => (
 		<Flex flexWrap="wrap" flexDirection="column" style={{ width: '100%' }}>
-			{items.map(item => renderItem(item))}
+			{console.log(items, 'items')}
+			{items?.map(item => renderItem(item))}
 		</Flex>
 	);
 
@@ -556,7 +559,7 @@ const ImageMapItems = ({ canvasRef, descriptors }) => {
 					{collapse ? null : (
 						<Input
 							style={{ margin: '8px' }}
-							placeholder={i18n.t('action.search-list')}
+							placeholder={'Search'}
 							onChange={onSearchNode}
 							value={textSearch}
 							allowClear
@@ -592,15 +595,15 @@ const ImageMapItems = ({ canvasRef, descriptors }) => {
 					</Flex>
 				</Scrollbar>
 			</Flex>
-			<SVGModal
+{/* 			<SVGModal
 				visible={svgModalVisible}
 				onOk={onAddSVG}
 				onCancel={onSVGModalVisible}
 				option={svgOption}
-			/>
+			/> */}
 		</div>
 	);
 
-}
+})
 
-export default memo(ImageMapItems);
+export default ImageMapItems;

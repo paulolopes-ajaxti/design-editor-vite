@@ -11,7 +11,7 @@ import DataSources from './datasources/DataSources';
 import Icon from '../../components/icon/Icon';
 import CommonButton from '../../components/common/CommonButton';
 
-class ImageMapConfigurationsClass extends Component {
+/* class ImageMapConfigurationsClass extends Component {
 	static propTypes = {
 		canvasRef: PropTypes.any,
 		selectedItem: PropTypes.object,
@@ -86,26 +86,16 @@ class ImageMapConfigurationsClass extends Component {
 					<Tabs.TabPane tab={<Icon name="star-half-alt" />} key="styles">
 						<Styles styles={styles} onChangeStyles={onChangeStyles} />
 					</Tabs.TabPane>
-					{/* <Tabs.TabPane tab={<Icon name="table" />} key="datasources">
+					 <Tabs.TabPane tab={<Icon name="table" />} key="datasources">
                         <DataSources ref={(c) => { this.dataSourcesRef = c; }} dataSources={dataSources} onChangeDataSources={onChangeDataSources} />
-                    </Tabs.TabPane> */}
+                    </Tabs.TabPane> 
 				</Tabs>
 			</div>
 		);
 	}
-}
+} */
 
-const ImageMapConfigurations = ({
-	onChange,
-	selectedItem,
-	canvasRef,
-	animations,
-	styles,
-	dataSources,
-	onChangeAnimations,
-	onChangeStyles,
-	onChangeDataSources,
-}) => {
+const ImageMapConfigurations = React.forwardRef(({ onChange, selectedItem, animations, styles, dataSources,	onChangeAnimations,	onChangeStyles,	onChangeDataSources}, canvasRef ) => {
 	const [activeKey, setActiveKey] = useState('map')
 	const [collapse, setCollapse] = useState(false)
 
@@ -134,7 +124,7 @@ const ImageMapConfigurations = ({
 				tabPosition="right"
 				style={{ height: '100%' }}
 				activeKey={activeKey}
-				onChange={onChangeTab}
+				onChange={(e) => onChangeTab(e)}
 				tabBarStyle={{ marginTop: 60 }}
 			>
 				<Tabs.TabPane tab={<Icon name="cog" />} key="map">
@@ -143,18 +133,18 @@ const ImageMapConfigurations = ({
 				<Tabs.TabPane tab={<Icon name="cogs" />} key="node">
 					<NodeProperties onChange={onChange} selectedItem={selectedItem} canvasRef={canvasRef} />
 				</Tabs.TabPane>
-				<Tabs.TabPane tab={<Icon name="vine" prefix="fab" />} key="animations">
+{/* 				<Tabs.TabPane tab={<Icon name="vine" prefix="fab" />} key="animations">
 					<Animations animations={animations} onChangeAnimations={onChangeAnimations} />
-				</Tabs.TabPane>
-				<Tabs.TabPane tab={<Icon name="star-half-alt" />} key="styles">
+				</Tabs.TabPane> */}
+{/* 				<Tabs.TabPane tab={<Icon name="star-half-alt" />} key="styles">
 					<Styles styles={styles} onChangeStyles={onChangeStyles} />
-				</Tabs.TabPane>
+				</Tabs.TabPane> */}
 				{/* <Tabs.TabPane tab={<Icon name="table" />} key="datasources">
 											<DataSources ref={(c) => { this.dataSourcesRef = c; }} dataSources={dataSources} onChangeDataSources={onChangeDataSources} />
 									</Tabs.TabPane> */}
 			</Tabs>
 		</div>
 	);
-}
+})
 
 export default ImageMapConfigurations;

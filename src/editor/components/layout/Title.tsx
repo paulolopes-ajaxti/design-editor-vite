@@ -1,10 +1,10 @@
 import { Button, Menu, Modal, Tooltip } from 'antd';
-import { ClickParam } from 'antd/lib/menu';
+import ClickParam from 'antd/lib/menu';
 import i18next from 'i18next';
 import React, { Component } from 'react';
 import { Flex } from '../flex';
 import { ShortcutHelp } from '../help';
-import Icon from '../icon/Icon';
+import Icon from '../icon/Icon.jsx';
 
 interface IProps {
 	onChangeEditor: (param: ClickParam) => void;
@@ -95,12 +95,10 @@ class Title extends Component<IProps> {
 						onClick={this.props.onChangeEditor}
 						selectedKeys={[this.props.currentEditor]}
 					>
-						<Menu.Item key="imagemap" style={{ color: '#fff' }}>
-							{i18next.t('imagemap.imagemap')}
-						</Menu.Item>
-						<Menu.Item key="workflow" style={{ color: '#fff' }}>
+						<Menu key="imagemap" style={{ color: '#fff' }} children={<span>{i18next.t('imagemap.imagemap')}</span>} />
+{/* 						<Menu.Item key="workflow" style={{ color: '#fff' }}>
 							{i18next.t('workflow.workflow')}
-						</Menu.Item>
+						</Menu.Item> */}
 						{/* <Menu.Item key="flow" style={{ color: '#fff' }}>{i18n.t('flow.flow')}</Menu.Item> */}
 						{/* <Menu.Item key="hexgrid" style={{ color: '#fff' }}>
 							{i18next.t('hexgrid.hexgrid')}

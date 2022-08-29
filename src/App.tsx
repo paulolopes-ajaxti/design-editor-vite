@@ -1,10 +1,11 @@
 import React from 'react'
+import { ImageMapEditor } from './editor/editors'
 
 function App() {
 
   return (
     <div className="App">
-      <Canvas />
+      <ImageMapEditor />
     </div>
   )
 }

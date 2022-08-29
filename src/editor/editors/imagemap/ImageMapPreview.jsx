@@ -62,9 +62,7 @@ const ImageMapPreview = ({ onChangePreview, onTooltip, onClick, preview, objects
 		preview && (
 			<div className={previewClassName}>
 				<div
-					ref={c => {
-						container = c;
-					}}
+					ref={container}
 					style={{
 						overvlow: 'hidden',
 						display: 'flex',

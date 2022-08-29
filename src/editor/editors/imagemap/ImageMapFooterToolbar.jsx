@@ -157,31 +157,31 @@ class ImageMapFooterToolbarClass extends Component {
 	}
 }
 
-const ImageMapFooterToolbar = ({ canvasRef, preview, onChangePreview, zoomRatio }) => {
+const ImageMapFooterToolbar = React.forwardRef(({ preview, onChangePreview, zoomRatio }, canvasRef) => {
 
 	const forceUpdate = React.useReducer(bool => !bool)[1];
 	const [interactionMode, setInteractionMode] = useState('selection')
 
 	const selection = () => {
-		if (canvasRef.handler.interactionHandler.isDrawingMode()) {
+		if (canvasRef.current.handler.interactionHandler.isDrawingMode()) {
 			return;
 		}
 		forceUpdate();
-		canvasRef.handler.interactionHandler.selection();
+		canvasRef.current.handler.interactionHandler.selection();
 		setInteractionMode('selection');
 	}
 	
 	const grab = () => {
-		if (canvasRef.handler.interactionHandler.isDrawingMode()) {
+		if (canvasRef.current.handler.interactionHandler.isDrawingMode()) {
 			return;
 		}
 		forceUpdate();
-		canvasRef.handler.interactionHandler.grab();
+		canvasRef.current.handler.interactionHandler.grab();
 		setInteractionMode('grab');
 	}
 	
 	const keydown = e => {
-		if (canvasRef.canvas.wrapperEl !== document.activeElement) {
+		if (canvasRef.current.canvas.wrapperEl !== document.activeElement) {
 			return false;
 		}
 		if (e.code === code.KEY_Q) {
@@ -192,11 +192,11 @@ const ImageMapFooterToolbar = ({ canvasRef, preview, onChangePreview, zoomRatio 
 	}
 
 	const attachEventListener = canvasRef => {
-		canvasRef.canvas.wrapperEl.addEventListener('keydown', keydown, false);
+		canvasRef?.current?.canvas?.wrapperEl.addEventListener('keydown', keydown, false);
 	};
 
 	const detachEventListener = canvasRef => {
-		canvasRef.canvas.wrapperEl.removeEventListener('keydown', keydown);
+		canvasRef?.current?.canvas?.wrapperEl.removeEventListener('keydown', keydown);
 	}
 
 	const	waitForCanvasRender = canvas => {
@@ -252,14 +252,14 @@ const ImageMapFooterToolbar = ({ canvasRef, preview, onChangePreview, zoomRatio 
 					<CommonButton
 						style={{ borderBottomLeftRadius: '8px', borderTopLeftRadius: '8px' }}
 						onClick={() => {
-							canvasRef.handler.zoomHandler.zoomOut();
+							canvasRef.current.handler.zoomHandler.zoomOut();
 						}}
 						icon="search-minus"
 						tooltipTitle={i18n.t('action.zoom-out')}
 					/>
 					<CommonButton
 						onClick={() => {
-							canvasRef.handler.zoomHandler.zoomOneToOne();
+							canvasRef.current.handler.zoomHandler.zoomOneToOne();
 						}}
 						tooltipTitle={i18n.t('action.one-to-one')}
 					>
@@ -267,7 +267,7 @@ const ImageMapFooterToolbar = ({ canvasRef, preview, onChangePreview, zoomRatio 
 					</CommonButton>
 					<CommonButton
 						onClick={() => {
-							canvasRef.handler.zoomHandler.zoomToFit();
+							canvasRef.current.handler.zoomHandler.zoomToFit();
 						}}
 						tooltipTitle={i18n.t('action.fit')}
 						icon="expand"
@@ -275,7 +275,7 @@ const ImageMapFooterToolbar = ({ canvasRef, preview, onChangePreview, zoomRatio 
 					<CommonButton
 						style={{ borderBottomRightRadius: '8px', borderTopRightRadius: '8px' }}
 						onClick={() => {
-							canvasRef.handler.zoomHandler.zoomIn();
+							canvasRef.current.handler.zoomHandler.zoomIn();
 						}}
 						icon="search-plus"
 						tooltipTitle={i18n.t('action.zoom-in')}
@@ -290,6 +290,6 @@ const ImageMapFooterToolbar = ({ canvasRef, preview, onChangePreview, zoomRatio 
 		</React.Fragment>
 	);
 
-}
+})
 
 export default ImageMapFooterToolbar;
