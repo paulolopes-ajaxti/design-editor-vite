@@ -9,9 +9,10 @@ interface IProps {
 	rightSider?: React.ReactNode;
 	className?: string;
 	loading?: boolean;
+	children?: React.ReactNode
 }
 
-class Content extends Component<IProps> {
+class ContentClass extends Component<IProps> {
 	static propTypes = {
 		title: PropTypes.any,
 		leftSider: PropTypes.any,
@@ -49,6 +50,29 @@ class Content extends Component<IProps> {
 			</Spin>
 		);
 	}
+}
+
+const Content = ({title, leftSider, content, rightSider, className, loading, children}: IProps) => {
+	return (
+		<Spin spinning={loading ? loading : false}>
+			<Layout className="rde-content-layout">
+				{title}
+				<Layout
+					style={{
+						overflowY: 'auto',
+						overflowX: 'hidden',
+						minHeight: `calc(100vh - ${title ? 98 : 60}px)`,
+						height: `calc(100vh - ${title ? 98 : 60}px)`,
+					}}
+					className={className ? className : 'rde-content-layout-main'}
+				>
+					{leftSider}
+					{content || children}
+					{rightSider}
+				</Layout>
+			</Layout>
+		</Spin>
+	);
 }
 
 export default Content;

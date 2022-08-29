@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, useState } from 'react';
 import PropTypes from 'prop-types';
 import { Tabs } from 'antd';
 import classnames from 'classnames';
@@ -11,7 +11,7 @@ import DataSources from './datasources/DataSources';
 import Icon from '../../components/icon/Icon';
 import CommonButton from '../../components/common/CommonButton';
 
-class ImageMapConfigurations extends Component {
+class ImageMapConfigurationsClass extends Component {
 	static propTypes = {
 		canvasRef: PropTypes.any,
 		selectedItem: PropTypes.object,
@@ -93,6 +93,68 @@ class ImageMapConfigurations extends Component {
 			</div>
 		);
 	}
+}
+
+const ImageMapConfigurations = ({
+	onChange,
+	selectedItem,
+	canvasRef,
+	animations,
+	styles,
+	dataSources,
+	onChangeAnimations,
+	onChangeStyles,
+	onChangeDataSources,
+}) => {
+	const [activeKey, setActiveKey] = useState('map')
+	const [collapse, setCollapse] = useState(false)
+
+	const onChangeTab = (key) => {
+		setActiveKey(key);
+	}
+
+	const onCollapse = () => {
+		setCollapse(!collapse)
+	}
+
+	const className = classnames('rde-editor-configurations', {
+		minimize: collapse,
+	})
+
+	return (
+		<div className={className}>
+			<CommonButton
+				className="rde-action-btn"
+				shape="circle"
+				icon={collapse ? 'angle-double-left' : 'angle-double-right'}
+				onClick={onCollapse}
+				style={{ position: 'absolute', top: 16, right: 16, zIndex: 1000 }}
+			/>
+			<Tabs
+				tabPosition="right"
+				style={{ height: '100%' }}
+				activeKey={activeKey}
+				onChange={onChangeTab}
+				tabBarStyle={{ marginTop: 60 }}
+			>
+				<Tabs.TabPane tab={<Icon name="cog" />} key="map">
+					<MapProperties onChange={onChange} canvasRef={canvasRef} />
+				</Tabs.TabPane>
+				<Tabs.TabPane tab={<Icon name="cogs" />} key="node">
+					<NodeProperties onChange={onChange} selectedItem={selectedItem} canvasRef={canvasRef} />
+				</Tabs.TabPane>
+				<Tabs.TabPane tab={<Icon name="vine" prefix="fab" />} key="animations">
+					<Animations animations={animations} onChangeAnimations={onChangeAnimations} />
+				</Tabs.TabPane>
+				<Tabs.TabPane tab={<Icon name="star-half-alt" />} key="styles">
+					<Styles styles={styles} onChangeStyles={onChangeStyles} />
+				</Tabs.TabPane>
+				{/* <Tabs.TabPane tab={<Icon name="table" />} key="datasources">
+											<DataSources ref={(c) => { this.dataSourcesRef = c; }} dataSources={dataSources} onChangeDataSources={onChangeDataSources} />
+									</Tabs.TabPane> */}
+			</Tabs>
+		</div>
+	);
 }
 
 export default ImageMapConfigurations;

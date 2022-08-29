@@ -1,7 +1,7 @@
 import { Badge, Button, Menu, Popconfirm } from 'antd';
 import i18n from 'i18next';
 import debounce from 'lodash/debounce';
-import React, { Component } from 'react';
+import React, { Component, useEffect, useState } from 'react';
 import Canvas from '../../canvas/Canvas';
 import CommonButton from '../../components/common/CommonButton';
 import { Content } from '../../components/layout';
@@ -73,7 +73,7 @@ const defaultOption = {
 	},
 };
 
-class ImageMapEditor extends Component {
+class ImageMapEditorClasse extends Component {
 	state = {
 		selectedItem: null,
 		zoomRatio: 1,
@@ -787,6 +787,31 @@ class ImageMapEditor extends Component {
 		);
 		return <Content title={title} content={content} loading={loading} className="" />;
 	}
+}
+
+const ImageMapEditor = () => {
+	const [selectedItem, setSelectedItem] = useState(null)
+	const [zoomRatio, setZoomRatio] = useState(1)
+	const [preview, setPreview] = useState(false)
+	const [loading, setLoading] = useState(false)
+	const [progress, setProgress] = useState(0)
+	const [animations, setAnimations] = useState([])
+	const [styles, setStyles] = useState([])
+	const [dataSources, setDataSources] = useState([])
+	const [editing, setEditing] = useState(false)
+	const [descriptors, setDescriptors] = useState({})
+	const [objects, setObjects] = useState(undefined)
+
+	useEffect(() => {
+		setLoading(true);
+		import('./Descriptors.json').then(descriptors => {
+			setDescriptors(descriptors)
+		})
+		setLoading(false)
+		setSelectedItem(null)
+	}, [])
+
+
 }
 
 export default ImageMapEditor;

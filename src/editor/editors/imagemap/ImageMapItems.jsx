@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, useEffect, useState, memo } from 'react';
 import PropTypes from 'prop-types';
 import { Collapse, notification, Input, message } from 'antd';
 import classnames from 'classnames';
@@ -9,14 +9,14 @@ import Icon from '../../components/icon/Icon';
 import Scrollbar from '../../components/common/Scrollbar';
 import CommonButton from '../../components/common/CommonButton';
 import { SVGModal } from '../../components/common';
-import { uuid } from 'uuidv4';
+import { nanoid } from 'nanoid';
 
 notification.config({
 	top: 80,
 	duration: 2,
 });
 
-class ImageMapItems extends Component {
+class ImageMapItemsClass extends Component {
 	static propTypes = {
 		canvasRef: PropTypes.any,
 		descriptors: PropTypes.object,
@@ -329,4 +329,278 @@ class ImageMapItems extends Component {
 	}
 }
 
-export default ImageMapItems;
+const ImageMapItems = ({ canvasRef, descriptors }) => {
+	const [activeKey, setActiveKey] = useState([])
+	const [collapse, setCollapse] = useState(false)
+	const [textSearch, setTextSearch] = useState('')
+	const [descriptorsState, setDescriptorsState] = useState({})
+	const [filteredDescriptors, setFilteredDescriptors] = useState([])
+	const [svgModalVisible, setSvgModalVisible] = useState(false)
+
+	const onAddItem = (item, centered) => {
+		if (canvasRef.handler.interactionMode === 'polygon') {
+			message.info('Already drawing');
+			return;
+		}
+		const id = nanoid();
+		const option = Object.assign({}, item.option, { id });
+		if (item.option.superType === 'svg' && item.type === 'default') {
+			onSVGModalVisible(item.option);
+			return;
+		}
+		canvasRef.handler.add(option, centered);
+	}
+
+	const onAddSVG = (option, centered) => {
+		const { canvasRef } = this.props;
+		canvasRef.handler.add({ ...option, type: 'svg', superType: 'svg', id: uuid(), name: 'New SVG' }, centered);
+		onSVGModalVisible();
+	}
+
+	const onDrawingItem = (item) => {
+		if (canvasRef.handler.interactionMode === 'polygon') {
+			message.info('Already drawing');
+			return;
+		}
+		if (item.option.type === 'line') {
+			canvasRef.handler.drawingHandler.line.init();
+		} else if (item.option.type === 'arrow') {
+			canvasRef.handler.drawingHandler.arrow.init();
+		} else {
+			canvasRef.handler.drawingHandler.polygon.init();
+		}
+	}
+
+	const onChangeActiveKey = (activeKey) => {
+		setActiveKey(activeKey);
+	}
+
+	const onCollapse = () => {
+		setCollapse(!collapse)
+	}
+
+	const transformList = () => {
+		return Object.values(descriptors).reduce((prev, curr) => prev.concat(curr), []);
+	}
+
+	const onSearchNode = e => {
+		const filteredDescriptors = transformList()
+			.filter(descriptor => descriptor.name.toLowerCase().includes(e.target.value.toLowerCase()));
+			setTextSearch(e.target.value)
+			setFilteredDescriptors(filteredDescriptors)
+	}
+
+	const onSVGModalVisible = () => {
+		setSvgModalVisible(prevState =>  !prevState);
+	}
+
+	const onDragStart = (e, item) => {
+		const { target } = e;
+		target.classList.add('dragging');
+	}
+
+	const onDragOver = (e) => {
+		if (e.preventDefault) {
+			e.preventDefault();
+		}
+		e.dataTransfer.dropEffect = 'copy';
+		return false;
+	}
+
+	const onDragEnter = (e) => {
+		const { target } = e;
+		target.classList.add('over');
+	}
+
+	const onDragLeave = (e) => {
+		const { target } = e;
+		target.classList.remove('over');
+	}
+	
+	const onDrop = (e, item) => {
+		e = e || window.event;
+		if (e.preventDefault) {
+			e.preventDefault();
+		}
+		if (e.stopPropagation) {
+			e.stopPropagation();
+		}
+		const { layerX, layerY } = e;
+		const dt = e.dataTransfer;
+		if (dt.types.length && dt.types[0] === 'Files') {
+			const { files } = dt;
+			Array.from(files).forEach(file => {
+				file.uid = uuid();
+				const { type } = file;
+				if (type === 'image/png' || type === 'image/jpeg' || type === 'image/jpg') {
+					const item = {
+						option: {
+							type: 'image',
+							file,
+							left: layerX,
+							top: layerY,
+						},
+					};
+					onAddItem(item, false);
+				} else {
+					notification.warn({
+						message: 'Not supported file type',
+					});
+				}
+			});
+			return false;
+		}
+		const option = Object.assign({}, item.option, { left: layerX, top: layerY });
+		const newItem = Object.assign({}, item, { option });
+		onAddItem(newItem, false);
+		return false;
+	}
+	
+	const onDragEnd = (e) => {
+		e.target.classList.remove('dragging');
+	}
+
+	const attachEventListener = (canvas) => {
+		canvas.canvas.wrapperEl.addEventListener('dragenter', onDragEnter, false);
+		canvas.canvas.wrapperEl.addEventListener('dragover', onDragOver, false);
+		canvas.canvas.wrapperEl.addEventListener('dragleave', onDragLeave, false);
+		canvas.canvas.wrapperEl.addEventListener('drop', onDrop, false);
+	};
+
+	const detachEventListener = (canvas) => {
+		canvas.canvas.wrapperEl.removeEventListener('dragenter', onDragEnter);
+		canvas.canvas.wrapperEl.removeEventListener('dragover', onDragOver);
+		canvas.canvas.wrapperEl.removeEventListener('dragleave', onDragLeave);
+		canvas.canvas.wrapperEl.removeEventListener('drop', onDrop);
+	};
+
+	const waitForCanvasRender = (canvas) => {
+		setTimeout(() => {
+			if (canvas) {
+				attachEventListener(canvas);
+				return;
+			}
+			waitForCanvasRender(canvasRef);
+		}, 5);
+	};
+
+	renderItem = (item, centered) =>
+		item.type === 'drawing' ? (
+			<div
+				key={item.name}
+				draggable
+				onClick={e => onDrawingItem(item)}
+				className="rde-editor-items-item"
+				style={{ justifyContent: collapse ? 'center' : null }}
+			>
+				<span className="rde-editor-items-item-icon">
+					<Icon name={item.icon.name} prefix={item.icon.prefix} style={item.icon.style} />
+				</span>
+				{collapse ? null : <div className="rde-editor-items-item-text">{item.name}</div>}
+			</div>
+		) : (
+			<div
+				key={item.name}
+				draggable
+				onClick={e => onAddItem(item, centered)}
+				onDragStart={e => onDragStart(e, item)}
+				onDragEnd={e => onDragEnd(e, item)}
+				className="rde-editor-items-item"
+				style={{ justifyContent: collapse ? 'center' : null }}
+			>
+				<span className="rde-editor-items-item-icon">
+					<Icon name={item.icon.name} prefix={item.icon.prefix} style={item.icon.style} />
+				</span>
+				{collapse ? null : <div className="rde-editor-items-item-text">{item.name}</div>}
+			</div>
+		);
+
+	renderItems = (items) => (
+		<Flex flexWrap="wrap" flexDirection="column" style={{ width: '100%' }}>
+			{items.map(item => renderItem(item))}
+		</Flex>
+	);
+
+	useEffect(() => {
+		waitForCanvasRender(canvasRef)
+
+		return () => {
+			detachEventListener(canvasRef)
+		}
+	}, []);
+
+	useEffect(() => {
+		const descript = Object.keys(descriptors).reduce((prev, key) => {
+			return prev.concat(descriptors[key]);
+		}, [])
+
+		setDescriptorsState(descript)
+
+	}, [descriptors])
+
+	const className = classnames('rde-editor-items', {
+		minimize: collapse,
+	});
+
+	return (
+		<div className={className}>
+			<Flex flex="1" flexDirection="column" style={{ height: '100%' }}>
+				<Flex justifyContent="center" alignItems="center" style={{ height: 40 }}>
+					<CommonButton
+						icon={collapse ? 'angle-double-right' : 'angle-double-left'}
+						shape="circle"
+						className="rde-action-btn"
+						style={{ margin: '0 4px' }}
+						onClick={onCollapse}
+					/>
+					{collapse ? null : (
+						<Input
+							style={{ margin: '8px' }}
+							placeholder={i18n.t('action.search-list')}
+							onChange={onSearchNode}
+							value={textSearch}
+							allowClear
+						/>
+					)}
+				</Flex>
+				<Scrollbar>
+					<Flex flex="1" style={{ overflowY: 'hidden' }}>
+						{(textSearch.length && renderItems(filteredDescriptors)) ||
+							(collapse ? (
+								<Flex
+									flexWrap="wrap"
+									flexDirection="column"
+									style={{ width: '100%' }}
+									justifyContent="center"
+								>
+									{transformList().map(item => renderItem(item))}
+								</Flex>
+							) : (
+								<Collapse
+									style={{ width: '100%' }}
+									bordered={false}
+									activeKey={activeKey.length ? activeKey : Object.keys(descriptors)}
+									onChange={onChangeActiveKey}
+								>
+									{Object.keys(descriptors).map(key => (
+										<Collapse.Panel key={key} header={key} showArrow={!collapse}>
+											{renderItems(descriptors[key])}
+										</Collapse.Panel>
+									))}
+								</Collapse>
+							))}
+					</Flex>
+				</Scrollbar>
+			</Flex>
+			<SVGModal
+				visible={svgModalVisible}
+				onOk={onAddSVG}
+				onCancel={onSVGModalVisible}
+				option={svgOption}
+			/>
+		</div>
+	);
+
+}
+
+export default memo(ImageMapItems);
