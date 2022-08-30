@@ -195,11 +195,9 @@ const ImageMapList = ({ canvasRef, selectedItem }) => {
 	};
 
 	const renderItem = () => {
-		const idCropping = canvasRef ? canvasRef.handler?.interactionMode === 'crop' : false;
+		const idCropping = canvasRef ? canvasRef?.handler?.interactionMode === 'crop' : false;
 		return canvasRef
-			? canvasRef.canvas
-					.getObjects()
-					.filter(obj => {
+			? canvasRef?.canvas?.getObjects()?.filter(obj => {
 						if (obj.id === 'workarea') {
 							return false;
 						}
@@ -251,10 +249,10 @@ const ImageMapList = ({ canvasRef, selectedItem }) => {
 								className={className}
 								flex="1"
 								style={{ cursor: 'pointer' }}
-								onClick={() => canvasRef.handler.select(obj)}
+								onClick={() => canvasRef?.handler.select(obj)}
 								onMouseDown={e => e.preventDefault()}
 								onDoubleClick={e => {
-									canvasRef.handler.zoomHandler.zoomToCenter();
+									canvasRef?.handler?.zoomHandler.zoomToCenter();
 								}}
 							>
 								<Flex alignItems="center">
@@ -273,7 +271,7 @@ const ImageMapList = ({ canvasRef, selectedItem }) => {
 											disabled={idCropping}
 											onClick={e => {
 												e.stopPropagation();
-												canvasRef.handler.duplicateById(obj.id);
+												canvasRef?.handler?.duplicateById(obj.id);
 											}}
 										>
 											<Icon name="clone" />
@@ -284,7 +282,7 @@ const ImageMapList = ({ canvasRef, selectedItem }) => {
 											disabled={idCropping}
 											onClick={e => {
 												e.stopPropagation();
-												canvasRef.handler.removeById(obj.id);
+												canvasRef?.handler?.removeById(obj.id);
 											}}
 										>
 											<Icon name="trash" />

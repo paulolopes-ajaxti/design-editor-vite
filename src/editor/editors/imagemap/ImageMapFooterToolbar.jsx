@@ -157,7 +157,7 @@ class ImageMapFooterToolbarClass extends Component {
 	}
 }
 
-const ImageMapFooterToolbar = React.forwardRef(({ preview, onChangePreview, zoomRatio }, canvasRef) => {
+const ImageMapFooterToolbar = ({ preview, onChangePreview, zoomRatio, canvasRef }) => {
 
 	const forceUpdate = React.useReducer(bool => !bool)[1];
 	const [interactionMode, setInteractionMode] = useState('selection')
@@ -290,6 +290,6 @@ const ImageMapFooterToolbar = React.forwardRef(({ preview, onChangePreview, zoom
 		</React.Fragment>
 	);
 
-})
+}
 
 export default ImageMapFooterToolbar;

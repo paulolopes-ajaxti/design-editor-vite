@@ -1,14 +1,11 @@
-import React, { Component, useEffect, useState, memo } from 'react';
-import PropTypes from 'prop-types';
+import React, { useEffect, useState, memo, useMemo, useImperativeHandle } from 'react';
 import { Collapse, notification, Input, message } from 'antd';
 import classnames from 'classnames';
-import i18n from 'i18next';
 
 import { Flex } from '../../components/flex';
 import Icon from '../../components/icon/Icon';
 import Scrollbar from '../../components/common/Scrollbar';
 import CommonButton from '../../components/common/CommonButton';
-import { SVGModal } from '../../components/common';
 import { nanoid } from 'nanoid';
 
 notification.config({
@@ -16,7 +13,7 @@ notification.config({
 	duration: 2,
 });
 
-class ImageMapItemsClass extends Component {
+/* class ImageMapItemsClass extends Component {
 	static propTypes = {
 		canvasRef: PropTypes.any,
 		descriptors: PropTypes.object,
@@ -94,7 +91,6 @@ class ImageMapItemsClass extends Component {
 		canvas.canvas.wrapperEl.removeEventListener('drop', this.events.onDrop);
 	};
 
-	/* eslint-disable react/sort-comp, react/prop-types */
 	handlers = {
 		onAddItem: (item, centered) => {
 			const { canvasRef } = this.props;
@@ -327,18 +323,17 @@ class ImageMapItemsClass extends Component {
 			</div>
 		);
 	}
-}
+} */
 
-const ImageMapItems = React.forwardRef(({ descriptors }, canvasRef) => {
+const ImageMapItems = React.forwardRef(( props , itemRef) => {
 	const [activeKey, setActiveKey] = useState([])
 	const [collapse, setCollapse] = useState(false)
 	const [textSearch, setTextSearch] = useState('')
 	const [descriptorsState, setDescriptorsState] = useState({})
 	const [filteredDescriptors, setFilteredDescriptors] = useState([])
-	const [svgModalVisible, setSvgModalVisible] = useState(false)
 
 	const onAddItem = (item, centered) => {
-		if (canvasRef?.current?.handler?.interactionMode === 'polygon') {
+		if (props.canvasRef?.current?.handler?.interactionMode === 'polygon') {
 			message.info('Already drawing');
 			return;
 		}
@@ -349,25 +344,21 @@ const ImageMapItems = React.forwardRef(({ descriptors }, canvasRef) => {
 			onSVGModalVisible(item.option);
 			return;
 		}
-		canvasRef?.current?.handler?.add(option, centered);
+		props.canvasRef?.current?.handler?.add(option, centered);
 	}
 
-	const onAddSVG = (option, centered) => {
-		canvasRef?.current?.handler?.add({ ...option, type: 'svg', superType: 'svg', id: nanoid(), name: 'New SVG' }, centered);
-		onSVGModalVisible();
-	}
 
 	const onDrawingItem = (item) => {
-		if (canvasRef?.current?.handler?.interactionMode === 'polygon') {
+		if (props.canvasRef?.current?.handler?.interactionMode === 'polygon') {
 			message.info('Already drawing');
 			return;
 		}
 		if (item.option.type === 'line') {
-			canvasRef?.current?.handler?.drawingHandler?.line.init();
+			props.canvasRef?.current?.handler?.drawingHandler?.line.init();
 		} else if (item.option.type === 'arrow') {
-			canvasRef?.current?.handler?.drawingHandler?.arrow.init();
+			props.canvasRef?.current?.handler?.drawingHandler?.arrow.init();
 		} else {
-			canvasRef?.current?.handler?.drawingHandler?.polygon.init();
+			props.canvasRef?.current?.handler?.drawingHandler?.polygon.init();
 		}
 	}
 
@@ -380,7 +371,7 @@ const ImageMapItems = React.forwardRef(({ descriptors }, canvasRef) => {
 	}
 
 	const transformList = () => {
-		return Object.values(descriptors).reduce((prev, curr) => prev.concat(curr), []);
+		return Object.values(props.descriptors).reduce((prev, curr) => prev.concat(curr), []);
 	}
 
 	const onSearchNode = e => {
@@ -388,10 +379,6 @@ const ImageMapItems = React.forwardRef(({ descriptors }, canvasRef) => {
 			.filter(descriptor => descriptor.name.toLowerCase().includes(e.target.value.toLowerCase()));
 			setTextSearch(e.target.value)
 			setFilteredDescriptors(filteredDescriptor)
-	}
-
-	const onSVGModalVisible = () => {
-		setSvgModalVisible(prevState =>  !prevState);
 	}
 
 	const onDragStart = (e, item) => {
@@ -482,10 +469,43 @@ const ImageMapItems = React.forwardRef(({ descriptors }, canvasRef) => {
 				attachEventListener(canvas);
 				return;
 			}
-			waitForCanvasRender(canvasRef);
+			waitForCanvasRender(props.canvasRef);
 		}, 5);
 	};
 
+	useImperativeHandle(itemRef, () => {
+		renderItem: (item, centered) =>
+		item.type === 'drawing' ? (
+			<div
+				key={item.name}
+				draggable
+				onClick={e => onDrawingItem(item)}
+				className="rde-editor-items-item"
+				style={{ justifyContent: collapse ? 'center' : null }}
+			>
+				<span className="rde-editor-items-item-icon">
+					<Icon name={item.icon.name} prefix={item.icon.prefix} style={item.icon.style} />
+				</span>
+				{collapse ? null : <div className="rde-editor-items-item-text">{item.name}</div>}
+			</div>
+		) : (
+			<div
+				key={item.name}
+				draggable
+				onClick={e => onAddItem(item, centered)}
+				onDragStart={e => onDragStart(e, item)}
+				onDragEnd={e => onDragEnd(e, item)}
+				className="rde-editor-items-item"
+				style={{ justifyContent: collapse ? 'center' : null }}
+			>
+				<span className="rde-editor-items-item-icon">
+					<Icon name={item.icon.name} prefix={item.icon.prefix} style={item.icon.style} />
+				</span>
+				{collapse ? null : <div className="rde-editor-items-item-text">{item.name}</div>}
+			</div>
+		);
+	})
+	
 	const renderItem = (item, centered) =>
 		item.type === 'drawing' ? (
 			<div
@@ -525,21 +545,27 @@ const ImageMapItems = React.forwardRef(({ descriptors }, canvasRef) => {
 	);
 
 	useEffect(() => {
-		waitForCanvasRender(canvasRef)
-
+		waitForCanvasRender(props.canvasRef)
 		return () => {
-			detachEventListener(canvasRef)
+			detachEventListener(props.canvasRef)
 		}
 	}, []);
 
-	useEffect(() => {
+/* 	useEffect(() => {
 		const descript = Object.keys(descriptors).reduce((prev, key) => {
 			return prev.concat(descriptors[key]);
 		}, [])
 
 		setDescriptorsState(descript)
 
-	}, [descriptors])
+	}, [descriptors]) */
+
+	useMemo(() => {
+		const descript = Object.keys(props.descriptors).reduce((prev, key) => {
+			return prev.concat(props.descriptors[key]);
+		}, [])
+		setDescriptorsState(descript)
+	},[props]);
 
 	const className = classnames('rde-editor-items', {
 		minimize: collapse,
@@ -582,12 +608,12 @@ const ImageMapItems = React.forwardRef(({ descriptors }, canvasRef) => {
 								<Collapse
 									style={{ width: '100%' }}
 									bordered={false}
-									activeKey={activeKey.length ? activeKey : Object.keys(descriptors)}
+									activeKey={activeKey.length ? activeKey : Object.keys(props.descriptors)}
 									onChange={onChangeActiveKey}
 								>
-									{Object.keys(descriptors).map(key => (
+									{Object.keys(props.descriptors).map(key => (
 										<Collapse.Panel key={key} header={key} showArrow={!collapse}>
-											{renderItems(descriptors[key])}
+											{renderItems(props.descriptors[key])}
 										</Collapse.Panel>
 									))}
 								</Collapse>
@@ -595,12 +621,6 @@ const ImageMapItems = React.forwardRef(({ descriptors }, canvasRef) => {
 					</Flex>
 				</Scrollbar>
 			</Flex>
-{/* 			<SVGModal
-				visible={svgModalVisible}
-				onOk={onAddSVG}
-				onCancel={onSVGModalVisible}
-				option={svgOption}
-			/> */}
 		</div>
 	);
 

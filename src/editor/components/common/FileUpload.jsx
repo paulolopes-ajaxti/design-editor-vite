@@ -5,7 +5,7 @@ import { InboxOutlined } from '@ant-design/icons'
 
 const { Dragger } = Upload;
 
-class FileUploadClass extends Component {
+/* class FileUploadClass extends Component {
 	static propTypes = {
 		onChange: PropTypes.func,
 		limit: PropTypes.number,
@@ -80,9 +80,9 @@ class FileUploadClass extends Component {
 			</Dragger>
 		);
 	}
-}
+} */
 
-const FileUpload = ({onChange,limit,accept, value}) => {
+const FileUpload = ({ onChange, limit, accept, value }) => {
 
 	let valorState = value ? value : []
 	const [fileList, setFileList] = useState(valorState)

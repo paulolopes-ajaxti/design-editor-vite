@@ -8,7 +8,7 @@ import Scrollbar from '../../../components/common/Scrollbar';
 
 const { Panel } = Collapse;
 
-class MapPropertiesClass extends Component {
+/* class MapPropertiesClass extends Component {
 	static propTypes = {
 		canvasRef: PropTypes.any,
 	};
@@ -39,9 +39,9 @@ class MapPropertiesClass extends Component {
 		}
 		return null;
 	}
-}
+} */
 
-const MapProperties = React.forwardRef((props, canvasRef) => {
+const MapProperties = ({ canvasRef, form}) => {
 	const showArrow = false;
 	if (canvasRef) {
 		return (
@@ -53,8 +53,8 @@ const MapProperties = React.forwardRef((props, canvasRef) => {
 								<Panel key={key} header={PropertyDefinition.map[key].title} showArrow={showArrow}>
 									{PropertyDefinition.map[key].component.render(
 										canvasRef,
-										props.form,
-										canvasRef.handler.workarea,
+										form,
+										canvasRef?.handler?.workarea,
 									)}
 								</Panel>
 							);
@@ -65,7 +65,7 @@ const MapProperties = React.forwardRef((props, canvasRef) => {
 		);
 	}
 	return null;
-})
+}
 
 export default Form.create({
 	onValuesChange: (props, changedValues, allValues) => {

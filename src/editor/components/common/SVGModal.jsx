@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { Modal, Radio } from 'antd';
-import { Form } from '@ant-design/compatible'
+import { Modal, Radio, Form } from 'antd';
 import i18n from 'i18next';
 
 import { InputHtml } from '.';
@@ -103,4 +102,4 @@ class SVGModal extends Component {
 	}
 }
 
-export default Form.create()(SVGModal);
+export default SVGModal;

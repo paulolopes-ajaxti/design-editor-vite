@@ -1,13 +1,14 @@
-import React from 'react'
-import { ImageMapEditor } from './editor/editors'
+import React from 'react';
+import { BrowserRouter as Router } from 'react-router-dom'
+import Routes from './routes/index'
 
 function App() {
-
   return (
-    <div className="App">
-      <ImageMapEditor />
-    </div>
-  )
+      <Router>
+        <Routes />
+      </Router>
+  );
 }
 
-export default App
+export default App;
+

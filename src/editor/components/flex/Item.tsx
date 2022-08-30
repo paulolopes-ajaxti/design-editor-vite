@@ -10,7 +10,7 @@ export interface ItemProps extends React.HTMLAttributes<any> {
 }
 
 const Item: React.FC<ItemProps> = props => {
-	const { alignSelf, order, flexGrow, flexShrink, flexBasis, flex, style, children, ...other } = props;
+	const { alignSelf, order, flexGrow, flexShrink, flexBasis, flex, style, children, ...rest } = props;
 	const newStyle = Object.assign(
 		{},
 		{
@@ -31,7 +31,7 @@ const Item: React.FC<ItemProps> = props => {
 				}
 				return prev;
 			}, {})}
-			{...other}
+			{...rest}
 		>
 			{children}
 		</div>

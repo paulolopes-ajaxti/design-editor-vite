@@ -182,8 +182,8 @@ class ImageMapHeaderToolbarclass extends Component {
 	}
 }
 
-const ImageMapHeaderToolbar = React.forwardRef(({ selectedItem }, canvasRef ) => {
-	const isCropping = canvasRef ? canvasRef.current.handler.interactionMode === 'crop' : false;
+const ImageMapHeaderToolbar = ({ selectedItem, canvasRef }) => {
+	const isCropping = canvasRef ? canvasRef?.current?.handler?.interactionMode === 'crop' : false;
 	return (
 		<Flex className="rde-editor-header-toolbar-container" flex="1">
 			<Flex.Item className="rde-canvas-toolbar rde-canvas-toolbar-list">
@@ -262,7 +262,7 @@ const ImageMapHeaderToolbar = React.forwardRef(({ selectedItem }, canvasRef ) =>
 					className="rde-action-btn"
 					shape="circle"
 					disabled={isCropping}
-					onClick={() => canvasRef.current.handler?.toGroup()}
+					onClick={() => canvasRef?.current?.handler?.toGroup()}
 					icon="object-group"
 					tooltipTitle={i18n.t('action.object-group')}
 				/>
@@ -270,7 +270,7 @@ const ImageMapHeaderToolbar = React.forwardRef(({ selectedItem }, canvasRef ) =>
 					className="rde-action-btn"
 					shape="circle"
 					disabled={isCropping}
-					onClick={() => canvasRef.current.handler?.toActiveSelection()}
+					onClick={() => canvasRef?.current?.handler?.toActiveSelection()}
 					icon="object-ungroup"
 					tooltipTitle={i18n.t('action.object-ungroup')}
 				/>
@@ -279,24 +279,24 @@ const ImageMapHeaderToolbar = React.forwardRef(({ selectedItem }, canvasRef ) =>
 				<CommonButton
 					className="rde-action-btn"
 					shape="circle"
-					disabled={canvasRef ? !canvasRef.current.handler?.cropHandler.validType() : true}
-					onClick={() => canvasRef.current.handler?.cropHandler.start()}
+					disabled={canvasRef ? !canvasRef?.current?.handler?.cropHandler?.validType() : true}
+					onClick={() => canvasRef?.current?.handler?.cropHandler?.start()}
 					icon="crop"
 					tooltipTitle={i18n.t('action.crop')}
 				/>
 				<CommonButton
 					className="rde-action-btn"
 					shape="circle"
-					disabled={canvasRef ? !canvasRef.current.handler?.cropHandler.cropRect : true}
-					onClick={() => canvasRef.current.handler?.cropHandler.finish()}
+					disabled={canvasRef ? !canvasRef.current?.handler?.cropHandler?.cropRect : true}
+					onClick={() => canvasRef?.current?.handler?.cropHandler.finish()}
 					icon="check"
 					tooltipTitle={i18n.t('action.crop-save')}
 				/>
 				<CommonButton
 					className="rde-action-btn"
 					shape="circle"
-					disabled={canvasRef ? !canvasRef.current.handler?.cropHandler.cropRect : true}
-					onClick={() => canvasRef.current.handler?.cropHandler.cancel()}
+					disabled={canvasRef ? !canvasRef?.current?.handler?.cropHandler?.cropRect : true}
+					onClick={() => canvasRef?.current?.handler?.cropHandler?.cancel()}
 					icon="times"
 					tooltipTitle={i18n.t('action.crop-cancel')}
 				/>
@@ -306,7 +306,7 @@ const ImageMapHeaderToolbar = React.forwardRef(({ selectedItem }, canvasRef ) =>
 					className="rde-action-btn"
 					shape="circle"
 					disabled={isCropping}
-					onClick={() => canvasRef.current.handler?.saveImage()}
+					onClick={() => canvasRef?.current?.handler?.saveImage()}
 					icon="image"
 					tooltipTitle={i18n.t('action.image-save')}
 				/>
@@ -314,7 +314,7 @@ const ImageMapHeaderToolbar = React.forwardRef(({ selectedItem }, canvasRef ) =>
 					className="rde-action-btn"
 					shape="circle"
 					disabled={isCropping}
-					onClick={() => canvasRef.current.handler?.duplicate()}
+					onClick={() => canvasRef?.current?.handler?.duplicate()}
 					icon="clone"
 					tooltipTitle={i18n.t('action.clone')}
 				/>
@@ -322,7 +322,7 @@ const ImageMapHeaderToolbar = React.forwardRef(({ selectedItem }, canvasRef ) =>
 					className="rde-action-btn"
 					shape="circle"
 					disabled={isCropping}
-					onClick={() => canvasRef.current.handler?.remove()}
+					onClick={() => canvasRef?.current?.handler?.remove()}
 					icon="trash"
 					tooltipTitle={i18n.t('action.delete')}
 				/>
@@ -330,16 +330,16 @@ const ImageMapHeaderToolbar = React.forwardRef(({ selectedItem }, canvasRef ) =>
 			<Flex.Item className="rde-canvas-toolbar rde-canvas-toolbar-history">
 				<CommonButton
 					className="rde-action-btn"
-					disabled={isCropping || (canvasRef && !canvasRef.current.handler?.transactionHandler.undos.length)}
-					onClick={() => canvasRef.current.handler?.transactionHandler.undo()}
+					disabled={isCropping || (canvasRef && !canvasRef?.current?.handler?.transactionHandler?.undos?.length)}
+					onClick={() => canvasRef?.current?.handler?.transactionHandler?.undo()}
 				>
 					<Icon name="undo-alt" style={{ marginRight: 8 }} />
 					Desfazer
 				</CommonButton>
 				<CommonButton
 					className="rde-action-btn"
-					disabled={isCropping || (canvasRef && !canvasRef.current.handler?.transactionHandler.redos.length)}
-					onClick={() => canvasRef?.current?.handler?.transactionHandler.redo()}
+					disabled={isCropping || (canvasRef && !canvasRef?.current?.handler?.transactionHandler?.redos?.length)}
+					onClick={() => canvasRef?.current?.handler?.transactionHandler?.redo()}
 				>
 					Refazer
 					<Icon name="redo-alt" style={{ marginLeft: 8 }} />
@@ -347,6 +347,6 @@ const ImageMapHeaderToolbar = React.forwardRef(({ selectedItem }, canvasRef ) =>
 			</Flex.Item>
 		</Flex>
 	);
-})
+}
 
 export default ImageMapHeaderToolbar;

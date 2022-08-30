@@ -1,4 +1,4 @@
-import React, { Component, useEffect, useState } from 'react';
+import React, { Component, useEffect, useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
 import { Button, Table, Modal, Input, Form } from 'antd';
 import i18n from 'i18next';
@@ -6,7 +6,7 @@ import i18n from 'i18next';
 import Icon from '../icon/Icon';
 import { Flex } from '../flex';
 
-class EditTableClass extends Component {
+/* class EditTableClass extends Component {
 	static propTypes = {
 		userProperty: PropTypes.object,
 		form: PropTypes.any,
@@ -223,7 +223,7 @@ class EditTableClass extends Component {
 			</Flex>
 		);
 	}
-}
+} */
 
 const EditTable = ({ userProperty, form, onChange}) => {
 	const [userPropertyState, setUserPropertyState] = useState(userProperty)
@@ -361,8 +361,8 @@ const EditTable = ({ userProperty, form, onChange}) => {
 		},
 	];
 
-	useEffect(() => {
-		setUserPropertyState(userProperty | {})
+	useMemo(() => {
+		setUserPropertyState(userProperty)
 
 	}, [userProperty])
 
@@ -382,7 +382,7 @@ const EditTable = ({ userProperty, form, onChange}) => {
 					pageSize: 5,
 				}}
 				columns={columns}
-				dataSource={getDataSource(userProperty)}
+				dataSource={getDataSource(userPropertyState)}
 			/>
 			<Modal onCancel={onCancel} onOk={onOk} visible={visible}>
 				<Form.Item

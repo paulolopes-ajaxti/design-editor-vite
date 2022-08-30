@@ -5,7 +5,16 @@ import React, { Component, useRef } from 'react';
 import Canvas from '../../canvas/Canvas';
 import Icon from '../../components/icon/Icon';
 
-class ImageMapPreviewClasse extends Component {
+interface IProps {
+	preview: boolean
+	onChangePreview: () => void
+	onTooltip: () => void
+	onAction: () => void
+	objects: {}
+	onClick: () => void
+}
+
+/* class ImageMapPreviewClasse extends Component {
 	static propTypes = {
 		preview: PropTypes.bool,
 		onChangePreview: PropTypes.func,
@@ -54,17 +63,19 @@ class ImageMapPreviewClasse extends Component {
 		);
 	}
 }
+ */
 
-const ImageMapPreview = ({ onChangePreview, onTooltip, onClick, preview, objects }) => {
+
+const ImageMapPreview = ({ onChangePreview, onTooltip, onClick, preview, objects }: IProps) => {
 	const previewClassName = classnames('rde-preview', { preview });
-	const container = useRef(null)
+	const container = useRef<HTMLDivElement>(null)
 	return (
 		preview && (
 			<div className={previewClassName}>
 				<div
 					ref={container}
 					style={{
-						overvlow: 'hidden',
+						overflow: 'hidden',
 						display: 'flex',
 						flex: '1',
 						height: '100%',

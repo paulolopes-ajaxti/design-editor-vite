@@ -17,7 +17,10 @@ export interface BoxProps extends React.HTMLAttributes<any> {
 	flex?: number | string;
 }
 
-class Flex extends Component<BoxProps> {
+type IFlex<T> = React.FC<T> & {
+	Item: React.FC
+}
+/* class FlexClass extends Component<BoxProps> {
 	static Item: typeof Item;
 
 	render() {
@@ -71,6 +74,60 @@ class Flex extends Component<BoxProps> {
 			</div>
 		);
 	}
+} */
+
+const Flex: IFlex<BoxProps> = (props) => {
+	const {
+		flexDirection,
+		flexWrap,
+		flexFlow,
+		justifyContent,
+		alignItems,
+		alignContent,
+		alignSelf,
+		order,
+		flexGrow,
+		flexShrink,
+		flexBasis,
+		flex,
+		style,
+		children,
+		...rest
+	} = props;
+	const newStyle = Object.assign(
+		{},
+		{
+			display: 'flex',
+			flexDirection,
+			flexWrap,
+			flexFlow,
+			justifyContent,
+			alignItems,
+			alignContent,
+			alignSelf,
+			order,
+			flexGrow,
+			flexShrink,
+			flexBasis,
+			flex,
+		},
+		style,
+	) as any;
+
+	return (
+		<div
+			style={Object.keys(newStyle).reduce((prev, key) => {
+				if (newStyle[key]) {
+					return Object.assign(prev, { [key]: newStyle[key] });
+				}
+				return prev;
+			}, {})}
+			{...rest}
+		>
+			{children}
+		</div>
+	);
+
 }
 
 Flex.Item = Item;

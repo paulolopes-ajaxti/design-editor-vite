@@ -1,7 +1,6 @@
-import React, { Component, useEffect } from 'react';
+import React, { Component, useEffect, useMemo } from 'react';
 import PropTypes from 'prop-types';
-import { Collapse, List } from 'antd';
-import { Form } from '@ant-design/compatible'
+import { Collapse, List, Form } from 'antd';
 
 import PropertyDefinition from './PropertyDefinition';
 import Scrollbar from '../../../components/common/Scrollbar';
@@ -9,7 +8,7 @@ import { Flex } from '../../../components/flex';
 
 const { Panel } = Collapse;
 
-class NodePropertiesClass extends Component {
+/* class NodePropertiesClass extends Component {
 	static propTypes = {
 		canvasRef: PropTypes.any,
 		selectedItem: PropTypes.object,
@@ -67,30 +66,31 @@ class NodePropertiesClass extends Component {
 		);
 	}
 }
+ */
 
-const NodeProperties = React.forwardRef((props, canvasRef) => {
+const NodeProperties = ({ selectedItem, canvasRef, onChange}) => {
+	const [form] = Form.useForm();
 	const showArrow = false;
 
-	useEffect(() => {
-			props.form.resetFields();
-	}, [props.selectedItem])
+	useMemo(() => {
+			form.resetFields();
+	}, [selectedItem])
 
 	return (
 		<Scrollbar>
-			<Form layout="horizontal" colon={false}>
+			<Form layout="horizontal" colon={false} onValuesChange={(changedValues, values) => onChange(selectedItem, changedValues, values)}>
 				<Collapse bordered={false}>
-					{props.selectedItem && PropertyDefinition[props.selectedItem.type] ? (
-						Object.keys(PropertyDefinition[props.selectedItem.type]).map(key => {
+					{selectedItem && PropertyDefinition[selectedItem.type] ? (
+						Object.keys(PropertyDefinition[selectedItem.type]).map(key => {
 							return (
 								<Panel
 									key={key}
-									header={PropertyDefinition[props.selectedItem.type][key].title}
+									header={PropertyDefinition[selectedItem.type][key].title}
 									showArrow={showArrow}
 								>
-									{PropertyDefinition[props.selectedItem.type][key].component.render(
+									{PropertyDefinition[selectedItem.type][key].component.render(
 										canvasRef,
-										props.form,
-										props.selectedItem,
+										selectedItem,
 									)}
 								</Panel>
 							);
@@ -115,11 +115,6 @@ const NodeProperties = React.forwardRef((props, canvasRef) => {
 		</Scrollbar>
 	);
 
-})
+}
 
-export default Form.create({
-	onValuesChange: (props, changedValues, allValues) => {
-		const { onChange, selectedItem } = props;
-		onChange(selectedItem, changedValues, allValues);
-	},
-})(NodeProperties);
+export default NodeProperties;

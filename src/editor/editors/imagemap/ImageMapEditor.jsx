@@ -16,6 +16,7 @@ import ImageMapTitle from './ImageMapTitle';
 import { useCanvasRef } from '../../../hooks/useCanvasRef'
 import { useForceUpdate } from '../../../hooks/useForceUpdate'
 import Descritptors from './Descriptors.json'
+import { Grid } from '@mui/material'
 
 const propertiesToInclude = [
 	'id',
@@ -75,7 +76,7 @@ const defaultOption = {
 	},
 };
 
-class ImageMapEditorClasse extends Component {
+/* class ImageMapEditorClasse extends Component {
 	state = {
 		selectedItem: null,
 		zoomRatio: 1,
@@ -789,7 +790,7 @@ class ImageMapEditorClasse extends Component {
 		);
 		return <Content title={title} content={content} loading={loading} className="" />;
 	}
-}
+} */
 
 const ImageMapEditor = () => {
 	const [selectedItem, setSelectedItem] = useState(null)
@@ -1215,7 +1216,7 @@ const ImageMapEditor = () => {
 							const newItem = Object.assign({}, item, { option });
 							return (
 								<Menu.Item style={{ padding: 0 }} key={item.name}>
-									{itemsRef?.renderItem(newItem, false)}
+									{itemsRef?.current.renderItem(newItem, false)}
 								</Menu.Item>
 							);
 						})}
@@ -1437,7 +1438,7 @@ const ImageMapEditor = () => {
 		</div>
 	);
 
-	return <Content title={title} content={content} loading={loading} className="" />;
+	return <Grid component="div" sx={{py: 5, width: '100%', display: 'block'}}><Content title={title} content={content} loading={loading} className="" /> </Grid>;
 
 
 }

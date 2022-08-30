@@ -95,7 +95,7 @@ import CommonButton from '../../components/common/CommonButton';
 	}
 } */
 
-const ImageMapConfigurations = React.forwardRef(({ onChange, selectedItem, animations, styles, dataSources,	onChangeAnimations,	onChangeStyles,	onChangeDataSources}, canvasRef ) => {
+const ImageMapConfigurations = ({ onChange, selectedItem, animations, styles, dataSources,	onChangeAnimations,	onChangeStyles,	onChangeDataSources, canvasRef}) => {
 	const [activeKey, setActiveKey] = useState('map')
 	const [collapse, setCollapse] = useState(false)
 
@@ -145,6 +145,6 @@ const ImageMapConfigurations = React.forwardRef(({ onChange, selectedItem, anima
 			</Tabs>
 		</div>
 	);
-})
+}
 
 export default ImageMapConfigurations;
